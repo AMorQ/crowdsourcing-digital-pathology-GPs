@@ -22,7 +22,8 @@ vgg_model = VGG16(weights='imagenet',
 
 #Adding custom Layers 
 x = vgg_model.output
-x = AveragePooling2D(pool_size=(7,7))(x)
+x = AveragePooling2D(pool_size=(7,7))(x) #Downsamples the input along its spatial dimensions (height and width)
+#by taking the average value over an input window (of size defined by pool_size) for each channel of the input
 
 # creating the final model 
 model_final = Model(input = vgg_model.input, output = x)
@@ -37,12 +38,13 @@ def extract_features(path, final_model, vgg_model):
     images_list = []
     name_list = []
     label_list = []
-    for root, subdirs, files in os.walk(path):
-        for name in tqdm(files):
+    for root, subdirs, files in os.walk(path): #OS.walk() generate the file names in a directory tree by walking the tree either top-down or bottom-up. 
+      #For each directory in the tree rooted at directory top (including top itself), it yields a 3-tuple (dirpath, dirnames, filenames).
+        for name in tqdm(files): #imprimir barra de progreso
             label_list.append(int(root.split('/')[len(root.split('/'))-1]))
-            image = io.imread(os.path.join(root,name))[:, :, :3]
+            image = io.imread(os.path.join(root,name))[:, :, :3] #leo una imagen rgba y me quedo con los canales rgb
             image = preprocess_input(image)
-            images_list.append(image)
+            images_list.append(image) #hago una lista de imágenes
             name_list.append(name)
 
 
@@ -50,7 +52,8 @@ def extract_features(path, final_model, vgg_model):
     images_list = np.array(images_list)
     name_list = np.array(name_list)
     label_list = np.array(label_list)
-    label_list = to_categorical(label_list)[:,1:]
+    label_list = to_categorical(label_list)[:,1:] 
+    
     features_vgg_pool512 = final_model.predict(images_list)
     features_vgg_pool512 = features_vgg_pool512.reshape(-1,512)
     features_vgg = vgg_model.predict(images_list, batch_size=8, verbose=1)
