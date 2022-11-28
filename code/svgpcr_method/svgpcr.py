@@ -63,7 +63,7 @@ class SVGPCR(GPModel):
                                      np.array([np.flatnonzero(v==self.class_keys)[0] for v in y[:,1]])), axis=1) for y in Y]) # same as Y but with indexes
         S = np.max([v.shape[0] for v in Y_idxs])
         ###########################################
-        ## pmr modification for CPU
+        ## pmr modification for CPU #???????????
         #Y_idxs_cr = np.array([np.concatenate((y,-1*np.ones((S-y.shape[0],2))),axis=0) for y in Y_idxs]).astype(np.int16) # NxSx2
         aux = np.array([self.num_annotators,0])
         Y_idxs_cr = np.array([np.concatenate((y,np.tile(aux,(S-y.shape[0],1))),axis=0) for y in Y_idxs]).astype(np.int16) # NxSx2
